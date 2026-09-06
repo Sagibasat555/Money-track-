@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>בניין והפעלת הכוח</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
+    
+    header { background: #111827; padding: 16px; text-align: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
+    header h1 { font-size: 1.1rem; color: var(--accent); letter-spacing: 0.5px; }
+
+    .tab-content { display: none; padding: 16px; }
+    .tab-content.active { display: block; }
+
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #334155; }
+    .card h2 { font-size: 1rem; margin-bottom: 12px; color: var(--accent); }
+
+    /* Budget Dashboard */
+    .balance-box { text-align: center; padding: 12px 0; }
+    .balance-box .amount { font-size: 2rem; font-weight: bold; }
+    .balance-box .sub { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+    .progress-bar { background: #334155; border-radius: 8px; height: 10px; overflow: hidden; margin-top: 12px; }
+    .progress-fill { background: var(--success); height: 100%; width: 100%; transition: width 0.3s, background 0.3s; }
+
+    /* Inputs & Forms */
+    label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, select, textarea { width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.95rem; }
+    button { width: 100%; background: var(--accent); color: #0f172a; font-weight: bold; border: none; padding: 12px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
+    button:active { opacity: 0.8; }
+
+    /* Transaction List */
+    .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155; }
+    .tx-item:last-child { border-bottom: none; }
+    .tx-info { display: flex; flex-direction: column; }
+    .tx-title { font-weight: 500; }
+    .tx-date { font-size: 0.75rem; color: var(--muted); }
+    .tx-amount { font-weight: bold; color: var(--danger); }
+    .delete-btn { background: none; border: none; color: var(--muted); width: auto; padding: 4px 8px; font-size: 0.9rem; }
+
+    /* Bottom Navigation */
+    nav { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #334155; display: flex; height: 65px; z-index: 20; }
+    .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; gap: 4px; padding: 0; }
+    .nav-btn.active { color: var(--accent); }
+    .nav-btn span { font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>בניין והפעלת הכוח</h1>
+  </header>
+
+  <!-- TAB 1: BUDGET -->
+  <section id="tab-budget" class="tab-content active">
+    <div class="card balance-box">
+      <div class="sub">יתרה לבזבוזים החודש (מתוך 450 ₪)</div>
+      <div class="amount" id="balance-val">₪450.00</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-bar"></div>
+      </div>
+      <div class="sub" id="weekly-sub">תקציב לשבוע הנוכחי: כ-₪112.50</div>
+    </div>
+
+    <div class="card">
+      <h2>הזנת הוצאה מהירה</h2>
+      <form id="tx-form">
+        <label>שם בית העסק</label>
+        <input type="text" id="tx-desc" placeholder="למשל: כוורת / ארומה" required>
+        
+        <label>סכום (₪)</label>
+        <input type="number" step="0.5" id="tx-amt" placeholder="0.00" required>
+        
+        <label>קטגוריה</label>
+        <select id="tx-cat">
+          <option value="כוורת ומכונות">כוורת / שקם / מכונות</option>
+          <option value="בתי קפה ושייקים">בתי קפה / שייקים</option>
+          <option value="יציאות סופ״ש">בילוי / יציאות סופ"ש</option>
+          <option value="תספורת וטיפוח">תספורת / טיפוח</option>
+          <option value="שונות ובלת״ם">שונות / בלת"ם</option>
+        </select>
+
+        <button type="submit">הוסף הוצאה</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>הוצאות אחרונות</h2>
+      <div id="tx-list"></div>
+    </div>
+  </section>
+
+  <!-- TAB 2: DIET -->
+  <section id="tab-diet" class="tab-content">
+    <div class="card">
+      <h2>נוהל מילת קוד: "דיאטה"</h2>
+      <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 12px;">רמזור לבחירת מזון מהירה בבסיס ובשקם:</p>
+      <div style="margin-bottom: 8px;">🟢 <strong>ירוק (מאושר):</strong> ביצים, טונה במים, חזה עוף, גבינות רזות, סלט ללא רטבים שמנים.</div>
+      <div style="margin-bottom: 8px;">🟡 <strong>צהוב (מדוד):</strong> לחם מלא, אורז, תפוחי אדמה, חטיף חלבון (עד 1 ביום).</div>
+      <div>🔴 <strong>אדום (להימנע):</strong> שתייה מתוקה, מאפים, שוקולדים, טיגונים, רטבים שמנים.</div>
+    </div>
+
+    <div class="card">
+      <h2>יומן ארוחות מהיר</h2>
+      <textarea id="diet-note" rows="3" placeholder="רשום כאן מה אכלת היום..."></textarea>
+      <button onclick="saveDietNote()">שמור ליומן</button>
+      <div id="diet-history" style="margin-top: 12px; font-size: 0.85rem;"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: FITNESS -->
+  <section id="tab-fitness" class="tab-content">
+    <div class="card">
+      <h2>מעקב אימונים ומיקרו-יעדים</h2>
+      <div style="margin-bottom: 12px;">
+        <label><input type="checkbox" id="fit-1" onchange="saveFitness()"> אימון A (חזה / כתפיים / יד אחורית)</label><br>
+        <label><input type="checkbox" id="fit-2" onchange="saveFitness()"> אימון B (גב / רגליים / יד קדמית)</label><br>
+        <label><input type="checkbox" id="fit-3" onchange="saveFitness()"> אימון סיבולת / ריצה</label>
+      </div>
+      <div class="sub">יעד שבועי: לפחות 3 אימונים (לא מפספסים פעמיים ברצף).</div>
+    </div>
+  </section>
+
+  <!-- TAB 4: REVIEW -->
+  <section id="tab-review" class="tab-content">
+    <div class="card">
+      <h2>יומן יעדים – בקרת מוצ"ש (22:00)</h2>
+      <label>1. נקודות לשימור השבוע (מה עבד מצוין?)</label>
+      <textarea id="rev-keep" rows="2"></textarea>
+
+      <label>2. נקודות לשיפור (איפה היו חריגות ואיך מונעים?)</label>
+      <textarea id="rev-improve" rows="2"></textarea>
+
+      <label>3. חוזה מחייב לשבוע הקרוב</label>
+      <textarea id="rev-contract" rows="2" placeholder="יעדי אימון, תקרת שקם לשבוע..."></textarea>
+
+      <button onclick="saveReview()">שמור בקרת מוצ״ש</button>
+    </div>
+  </section>
+
+  <!-- BOTTOM NAV -->
+  <nav>
+    <button class="nav-btn active" onclick="switchTab('budget')">
+      <span>💰</span>תקציב
+    </button>
+    <button class="nav-btn" onclick="switchTab('diet')">
+      <span>🥗</span>דיאטה
+    </button>
+    <button class="nav-btn" onclick="switchTab('fitness')">
+      <span>🏋️</span>כושר
+    </button>
+    <button class="nav-btn" onclick="switchTab('review')">
+      <span>📅</span>מוצ״ש
+    </button>
+  </nav>
+
+  <script>
+    const MONTHLY_LIMIT = 450;
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function renderBudget() {
+      const totalSpent = transactions.reduce((sum, tx) => sum + tx.amount, 0);
+      const remaining = MONTHLY_LIMIT - totalSpent;
+      const balanceEl = document.getElementById('balance-val');
+      const progressEl = document.getElementById('progress-bar');
+
+      balanceEl.innerText = '₪' + remaining.toFixed(2);
+      if (remaining <= 50) {
+        balanceEl.style.color = 'var(--danger)';
+        progressEl.style.background = 'var(--danger)';
+      } else if (remaining <= 150) {
+        balanceEl.style.color = 'var(--warning)';
+        progressEl.style.background = 'var(--warning)';
+      } else {
+        balanceEl.style.color = 'var(--text)';
+        progressEl.style.background = 'var(--success)';
+      }
+
+      const pct = Math.max(0, Math.min(100, (remaining / MONTHLY_LIMIT) * 100));
+      progressEl.style.width = pct + '%';
+
+      const listEl = document.getElementById('tx-list');
+      listEl.innerHTML = '';
+      if (transactions.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--muted); font-size:0.85rem; text-align:center; padding:10px;">אין הוצאות מתועדות החודש</div>';
+        return;
+      }
+
+      transactions.slice().reverse().forEach((tx, idx) => {
+        const actualIdx = transactions.length - 1 - idx;
+        const item = document.createElement('div');
+        item.className = 'tx-item';
+        item.innerHTML = `
+          <div class="tx-info">
+            <span class="tx-title">${tx.desc}</span>
+            <span class="tx-date">${tx.cat} • ${tx.date}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="tx-amount">-₪${tx.amount.toFixed(2)}</span>
+            <button class="delete-btn" onclick="deleteTx(${actualIdx})">✕</button>
+          </div>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    document.getElementById('tx-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const desc = document.getElementById('tx-desc').value;
+      const amount = parseFloat(document.getElementById('tx-amt').value);
+      const cat = document.getElementById('tx-cat').value;
+      const date = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+
+      transactions.push({ desc, amount, cat, date });
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+      document.getElementById('tx-desc').value = '';
+      document.getElementById('tx-amt').value = '';
+      renderBudget();
+    });
+
+    function deleteTx(idx) {
+      transactions.splice(idx, 1);
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+      renderBudget();
+    }
+
+    function saveDietNote() {
+      const note = document.getElementById('diet-note').value;
+      if (!note) return;
+      const history = JSON.parse(localStorage.getItem('dietHistory')) || [];
+      const date = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+      history.push({ date, note });
+      localStorage.setItem('dietHistory', JSON.stringify(history));
+      document.getElementById('diet-note').value = '';
+      renderDietHistory();
+    }
+
+    function renderDietHistory() {
+      const history = JSON.parse(localStorage.getItem('dietHistory')) || [];
+      const el = document.getElementById('diet-history');
+      el.innerHTML = history.slice().reverse().map(h => `<div style="padding:4px 0; border-bottom:1px solid #334155;"><strong>${h.date}:</strong> ${h.note}</div>`).join('');
+    }
+
+    function saveFitness() {
+      const state = {
+        f1: document.getElementById('fit-1').checked,
+        f2: document.getElementById('fit-2').checked,
+        f3: document.getElementById('fit-3').checked
+      };
+      localStorage.setItem('fitnessState', JSON.stringify(state));
+    }
+
+    function loadFitness() {
+      const state = JSON.parse(localStorage.getItem('fitnessState')) || {};
+      if (state.f1) document.getElementById('fit-1').checked = true;
+      if (state.f2) document.getElementById('fit-2').checked = true;
+      if (state.f3) document.getElementById('fit-3').checked = true;
+    }
+
+    function saveReview() {
+      const rev = {
+        keep: document.getElementById('rev-keep').value,
+        improve: document.getElementById('rev-improve').value,
+        contract: document.getElementById('rev-contract').value,
+        savedAt: new Date().toLocaleDateString('he-IL')
+      };
+      localStorage.setItem('weeklyReview', JSON.stringify(rev));
+      alert('בקרת מוצ״ש נשמרה בהצלחה!');
+    }
+
+    function loadReview() {
+      const rev = JSON.parse(localStorage.getItem('weeklyReview')) || {};
+      if (rev.keep) document.getElementById('rev-keep').value = rev.keep;
+      if (rev.improve) document.getElementById('rev-improve').value = rev.improve;
+      if (rev.contract) document.getElementById('rev-contract').value = rev.contract;
+    }
+
+    // Init
+    renderBudget();
+    renderDietHistory();
+    loadFitness();
+    loadReview();
+  </script>
+</body>
+</html>
