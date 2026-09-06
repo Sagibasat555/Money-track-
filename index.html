@@ -13,99 +13,322 @@
       --muted: #94a3b8;
       --danger: #ef4444;
       --success: #22c55e;
+      --warning: #f59e0b;
       --pro: #38bdf8;
       --fat: #f59e0b;
       --carb: #a855f7;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; }
+    
     header { background: #111827; padding: 16px; text-align: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
-    header h1 { font-size: 1.1rem; color: var(--accent); }
+    header h1 { font-size: 1.1rem; color: var(--accent); letter-spacing: 0.5px; }
 
-    .card { background: var(--card); border-radius: 12px; padding: 16px; margin: 16px; border: 1px solid #334155; }
-    .balance-box { text-align: center; }
-    .balance-box .amount { font-size: 2.2rem; font-weight: bold; }
+    .tab-content { display: none; padding: 16px; }
+    .tab-content.active { display: block; }
+
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #334155; }
+    .card h2 { font-size: 1rem; margin-bottom: 12px; color: var(--accent); }
+
+    /* Dashboard Boxes */
+    .balance-box { text-align: center; padding: 12px 0; }
+    .balance-box .amount { font-size: 2.1rem; font-weight: bold; }
     .balance-box .sub { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
     .progress-bar { background: #334155; border-radius: 8px; height: 10px; overflow: hidden; margin-top: 12px; }
-    .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.3s; }
+    .progress-fill { background: var(--success); height: 100%; width: 100%; transition: width 0.3s, background 0.3s; }
 
-    /* רשת מדדי מאקרו חיים */
+    /* Macro Grid */
     .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; text-align: center; }
     .macro-item { background: #0f172a; padding: 8px 4px; border-radius: 8px; border: 1px solid #334155; }
-    .macro-item .m-title { font-size: 0.75rem; color: var(--muted); margin-bottom: 2px; }
+    .macro-item .m-title { font-size: 0.72rem; color: var(--muted); margin-bottom: 2px; }
     .macro-item .m-val { font-size: 0.95rem; font-weight: bold; }
 
-    /* אזור ניתוח בלייב */
-    .live-box { border: 2px dashed #0284c7; background: rgba(2, 132, 199, 0.05); text-align: center; }
-    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-top: 8px; font-weight: bold; }
-    .status-ready { background: #1e293b; color: var(--muted); }
+    /* Inputs & Forms */
+    label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, select, textarea { width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.95rem; }
+    .row-inputs { display: flex; gap: 8px; }
+    .row-inputs > div { flex: 1; }
+    button.btn { width: 100%; background: var(--accent); color: #0f172a; font-weight: bold; border: none; padding: 12px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
+    button.btn:active { opacity: 0.8; }
+    .camera-btn { background: #0284c7; color: #fff; margin-bottom: 10px; }
 
-    /* רשימת מנות */
-    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155; font-size: 0.85rem; }
-    .item-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    /* Lists */
+    .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155; }
+    .tx-item:last-child { border-bottom: none; }
+    .tx-info { display: flex; flex-direction: column; }
+    .tx-title { font-weight: 500; font-size: 0.9rem; }
+    .tx-date { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .tx-amount { font-weight: bold; color: var(--danger); }
     .delete-btn { background: none; border: none; color: var(--muted); padding: 4px 8px; font-size: 0.9rem; cursor: pointer; }
-    button.action-btn { width: 100%; background: var(--accent); color: #0f172a; font-weight: bold; border: none; padding: 12px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; margin-top: 8px; }
+
+    /* Nav */
+    nav { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #334155; display: flex; height: 65px; z-index: 20; }
+    .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; gap: 4px; padding: 0; cursor: pointer; }
+    .nav-btn.active { color: var(--accent); }
+    .nav-btn span { font-size: 1.2rem; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>בניין והפעלת הכוח – תזונה ומאקרו בלייב</h1>
+    <h1>בניין והפעלת הכוח</h1>
   </header>
 
-  <!-- לוח בקרה ראשי למאקרו ויתרה -->
-  <section class="card balance-box">
-    <div class="sub">קלוריות שנצרכו היום (יעד: 1,850)</div>
-    <div class="amount" id="cal-val">0</div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="cal-progress"></div>
+  <!-- TAB 1: תקציב (450 ₪ + אפל פיי) -->
+  <section id="tab-budget" class="tab-content active">
+    <div class="card balance-box">
+      <div class="sub">יתרה לבזבוזים החודש (מתוך 450 ₪)</div>
+      <div class="amount" id="balance-val">₪450.00</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="budget-progress"></div>
+      </div>
+      <div class="sub" id="weekly-sub">תקציב לשבוע הנוכחי: כ-₪112.50</div>
     </div>
-    <div class="sub" id="cal-remaining" style="font-weight:bold; margin-top:8px;">נותרו: 1,850 קלוריות</div>
 
-    <!-- מאקרו מצטבר בלייב -->
-    <div class="macro-grid">
-      <div class="macro-item">
-        <div class="m-title" style="color:var(--pro);">חלבון</div>
-        <div class="m-val" id="macro-pro">0g</div>
-      </div>
-      <div class="macro-item">
-        <div class="m-title" style="color:var(--carb);">פחמימות</div>
-        <div class="m-val" id="macro-carb">0g</div>
-      </div>
-      <div class="macro-item">
-        <div class="m-title" style="color:var(--fat);">שומן</div>
-        <div class="m-val" id="macro-fat">0g</div>
-      </div>
-      <div class="macro-item">
-        <div class="m-title" style="color:var(--success);">סיבים</div>
-        <div class="m-val" id="macro-fib">0g</div>
-      </div>
+    <div class="card">
+      <h2>הזנת הוצאה מהירה</h2>
+      <form id="tx-form">
+        <label>שם בית העסק</label>
+        <input type="text" id="tx-desc" placeholder="כוורת, ארומה, זארה..." required>
+        
+        <label>סכום (₪)</label>
+        <input type="number" step="0.5" id="tx-amt" placeholder="0.00" required>
+        
+        <label>קטגוריה</label>
+        <select id="tx-cat">
+          <option value="כוורת ומכונות">כוורת / שקם / מכונות בבסיס</option>
+          <option value="בתי קפה ושייקים">בתי קפה ושייקים (ארומה, Rebar)</option>
+          <option value="אוכל ומסעדות">אוכל ומסעדות</option>
+          <option value="ברים ואלכוהול">ברים ואלכוהול (חיי לילה)</option>
+          <option value="בגדים והנעלה">בגדים והנעלה</option>
+          <option value="טיפוח ומספרה">טיפוח, פארם ומספרה</option>
+          <option value="סופר ונוחות">סופר, מכולת ונוחות</option>
+          <option value="שונות ובלת״ם">שונות ובלת״ם</option>
+        </select>
+
+        <button type="submit" class="btn">רשום הוצאה</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>הוצאות אחרונות</h2>
+      <div id="tx-list"></div>
     </div>
   </section>
 
-  <!-- סורק לייב מובנה במכשיר -->
-  <section class="card live-box">
-    <h2 style="color:var(--accent);">📸 סורק מנות אוטומטי (AI Live)</h2>
-    <p style="font-size:0.8rem; color:var(--muted); margin-bottom:10px;">צלם את הצלחת – הנתונים יפוענחו ויתעדכנו ישירות במדדים</p>
-    
-    <input type="file" id="camera-file" accept="image/*" capture="environment" style="display:none;" onchange="processLiveImage(event)">
-    <button class="action-btn" onclick="document.getElementById('camera-file').click()">צלם צלחת לעדכון אוטומטי</button>
-    
-    <div id="live-status" class="status-badge status-ready">ממתין לצילום</div>
+  <!-- TAB 2: תזונה ומאקרו בלייב -->
+  <section id="tab-diet" class="tab-content">
+    <div class="card balance-box">
+      <div class="sub">קלוריות שנצרכו היום (יעד: 1,850)</div>
+      <div class="amount" id="cal-val">0</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="cal-progress"></div>
+      </div>
+      <div class="sub" id="cal-remaining" style="font-weight:bold; margin-top:6px;">נותרו: 1,850 קלוריות</div>
+
+      <div class="macro-grid">
+        <div class="macro-item">
+          <div class="m-title" style="color:var(--pro);">חלבון</div>
+          <div class="m-val" id="macro-pro">0g</div>
+        </div>
+        <div class="macro-item">
+          <div class="m-title" style="color:var(--carb);">פחמימות</div>
+          <div class="m-val" id="macro-carb">0g</div>
+        </div>
+        <div class="macro-item">
+          <div class="m-title" style="color:var(--fat);">שומן</div>
+          <div class="m-val" id="macro-fat">0g</div>
+        </div>
+        <div class="macro-item">
+          <div class="m-title" style="color:var(--success);">סיבים</div>
+          <div class="m-val" id="macro-fib">0g</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📸 צילום צלחת לחישוב</h2>
+      <input type="file" id="camera-file" accept="image/*" capture="environment" style="display:none;" onchange="alert('התמונה צולמה! העלה אותה לצ\'אט לקבלת קישור העדכון המיידי.')">
+      <button class="btn camera-btn" onclick="document.getElementById('camera-file').click()">פתח מצלמה לתיעוד מנה</button>
+      <div style="font-size:0.8rem; color:var(--muted); line-height:1.5;">
+        🟢 <strong>ירוק (מאושר):</strong> ביצים, טונה במים, חזה עוף, גבינות רזות, ירקות.<br>
+        🟡 <strong>צהוב (מדוד):</strong> אורז, פסטה, תפוחי אדמה, לחם מלא, יוגורט פרו.<br>
+        🔴 <strong>אדום (להימנע):</strong> שתייה מתוקה, טיגונים, מאפים, שוקולדים ורטבים שמנים.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>הזנת מאקרו ידנית</h2>
+      <form id="meal-form">
+        <label>שם המנה ומרכיבים</label>
+        <input type="text" id="meal-desc" placeholder="חזה עוף, אורז וסלט" required>
+
+        <div class="row-inputs">
+          <div>
+            <label>קלוריות</label>
+            <input type="number" id="meal-cal" placeholder="620" required>
+          </div>
+          <div>
+            <label>חלבון (ג׳)</label>
+            <input type="number" step="0.1" id="meal-pro" placeholder="45" required>
+          </div>
+        </div>
+
+        <div class="row-inputs">
+          <div>
+            <label>פחמימות (ג׳)</label>
+            <input type="number" step="0.1" id="meal-carb" placeholder="50">
+          </div>
+          <div>
+            <label>שומן (ג׳)</label>
+            <input type="number" step="0.1" id="meal-fat" placeholder="12">
+          </div>
+          <div>
+            <label>סיבים (ג׳)</label>
+            <input type="number" step="0.1" id="meal-fib" placeholder="4">
+          </div>
+        </div>
+
+        <button type="submit" class="btn">הוסף למאזן היומי</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>פירוט מה שנאכל היום</h2>
+      <div id="meal-list"></div>
+      <button onclick="resetDay()" style="background:none; border:1px solid #334155; color:var(--muted); width:100%; margin-top:14px; padding:8px; border-radius:6px; font-size:0.8rem; cursor:pointer;">איפוס יום חדש</button>
+    </div>
   </section>
 
-  <!-- פירוט המנות שנאכלו -->
-  <section class="card">
-    <h2>פירוט מה שנאכל היום</h2>
-    <div id="meal-list"></div>
-    <button onclick="resetDay()" style="background:none; border:1px solid #334155; color:var(--muted); width:100%; margin-top:14px; padding:8px; border-radius:6px; font-size:0.8rem;">איפוס יום חדש</button>
+  <!-- TAB 3: כושר ואימונים -->
+  <section id="tab-fitness" class="tab-content">
+    <div class="card">
+      <h2>מעקב אימונים ומיקרו-יעדים</h2>
+      <div style="margin-bottom: 12px; line-height: 2;">
+        <label><input type="checkbox" id="fit-1" onchange="saveFitness()"> 🏋️ אימון A (חזה / כתפיים / יד אחורית)</label>
+        <label><input type="checkbox" id="fit-2" onchange="saveFitness()"> 🏋️ אימון B (גב / רגליים / יד קדמית)</label>
+        <label><input type="checkbox" id="fit-3" onchange="saveFitness()"> 🏃 אימון סיבולת / ריצת שבת</label>
+      </div>
+      <div class="sub">יעד ברזל שבועי: לפחות 3 אימונים (לא מפספסים פעמיים ברצף).</div>
+    </div>
   </section>
+
+  <!-- TAB 4: בקרת מוצ"ש -->
+  <section id="tab-review" class="tab-content">
+    <div class="card">
+      <h2>יומן יעדים – בקרת מוצ"ש (22:00)</h2>
+      <label>1. נקודות לשימור השבוע (מה עבד מצוין?)</label>
+      <textarea id="rev-keep" rows="2" placeholder="עמידה בקלוריות, ריצה מוצלחת..."></textarea>
+
+      <label>2. נקודות לשיפור (איפה היו חריגות ואיך מונעים?)</label>
+      <textarea id="rev-improve" rows="2" placeholder="טפטופים בשקם, עייפות..."></textarea>
+
+      <label>3. חוזה מחייב לשבוע הקרוב</label>
+      <textarea id="rev-contract" rows="2" placeholder="משקלי עבודה, תקרת כוורת שבועית..."></textarea>
+
+      <button class="btn" onclick="saveReview()">שמור בקרת מוצ״ש</button>
+    </div>
+  </section>
+
+  <!-- סרגל ניווט תחתון -->
+  <nav>
+    <button class="nav-btn active" onclick="switchTab('budget')">
+      <span>💰</span>תקציב
+    </button>
+    <button class="nav-btn" onclick="switchTab('diet')">
+      <span>🥗</span>תזונה
+    </button>
+    <button class="nav-btn" onclick="switchTab('fitness')">
+      <span>🏋️</span>כושר
+    </button>
+    <button class="nav-btn" onclick="switchTab('review')">
+      <span>📅</span>מוצ״ש
+    </button>
+  </nav>
 
   <script>
+    const MONTHLY_LIMIT = 450;
     const TARGET_CAL = 1850;
+
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
     let meals = JSON.parse(localStorage.getItem('liveMeals')) || [];
 
-    function renderUI() {
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    }
+
+    /* --- תקציב --- */
+    function renderBudget() {
+      const totalSpent = transactions.reduce((sum, tx) => sum + tx.amount, 0);
+      const remaining = MONTHLY_LIMIT - totalSpent;
+      const balanceEl = document.getElementById('balance-val');
+      const progressEl = document.getElementById('budget-progress');
+
+      balanceEl.innerText = '₪' + remaining.toFixed(2);
+      if (remaining <= 50) {
+        balanceEl.style.color = 'var(--danger)';
+        progressEl.style.background = 'var(--danger)';
+      } else if (remaining <= 150) {
+        balanceEl.style.color = 'var(--warning)';
+        progressEl.style.background = 'var(--warning)';
+      } else {
+        balanceEl.style.color = 'var(--text)';
+        progressEl.style.background = 'var(--success)';
+      }
+
+      const pct = Math.max(0, Math.min(100, (remaining / MONTHLY_LIMIT) * 100));
+      progressEl.style.width = pct + '%';
+
+      const listEl = document.getElementById('tx-list');
+      listEl.innerHTML = '';
+      if (transactions.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--muted); font-size:0.85rem; text-align:center; padding:10px;">אין הוצאות מתועדות החודש</div>';
+        return;
+      }
+
+      transactions.slice().reverse().forEach((tx, idx) => {
+        const actualIdx = transactions.length - 1 - idx;
+        const item = document.createElement('div');
+        item.className = 'tx-item';
+        item.innerHTML = `
+          <div class="tx-info">
+            <span class="tx-title">${tx.desc}</span>
+            <span class="tx-date">${tx.cat} • ${tx.date}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="tx-amount">-₪${tx.amount.toFixed(2)}</span>
+            <button class="delete-btn" onclick="deleteTx(${actualIdx})">✕</button>
+          </div>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    document.getElementById('tx-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const desc = document.getElementById('tx-desc').value;
+      const amount = parseFloat(document.getElementById('tx-amt').value);
+      const cat = document.getElementById('tx-cat').value;
+      const date = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+
+      transactions.push({ desc, amount, cat, date });
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+      document.getElementById('tx-desc').value = '';
+      document.getElementById('tx-amt').value = '';
+      renderBudget();
+    });
+
+    function deleteTx(idx) {
+      transactions.splice(idx, 1);
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+      renderBudget();
+    }
+
+    /* --- תזונה ומאקרו --- */
+    function renderDiet() {
       const cal = meals.reduce((s, m) => s + m.cal, 0);
       const pro = meals.reduce((s, m) => s + m.pro, 0);
       const carb = meals.reduce((s, m) => s + m.carb, 0);
@@ -139,10 +362,10 @@
       meals.slice().reverse().forEach((m, idx) => {
         const realIdx = meals.length - 1 - idx;
         list.innerHTML += `
-          <div class="item-row">
-            <div>
-              <strong>${m.desc}</strong>
-              <div class="item-meta">חלבון: ${m.pro}ג | שומן: ${m.fat}ג | פחמימה: ${m.carb}ג | סיבים: ${m.fib}ג</div>
+          <div class="tx-item">
+            <div class="tx-info">
+              <span class="tx-title">${m.desc}</span>
+              <span class="tx-date">חלבון: ${m.pro}ג | פחמימה: ${m.carb}ג | שומן: ${m.fat}ג | סיבים: ${m.fib}ג</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-weight:bold; color:var(--accent);">${m.cal} קל'</span>
@@ -153,40 +376,106 @@
       });
     }
 
-    function addMealAuto(desc, cal, pro, fat, carb, fib) {
-      meals.push({ desc, cal, pro, fat, carb, fib });
+    document.getElementById('meal-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const desc = document.getElementById('meal-desc').value;
+      const cal = parseInt(document.getElementById('meal-cal').value);
+      const pro = parseFloat(document.getElementById('meal-pro').value) || 0;
+      const carb = parseFloat(document.getElementById('meal-carb').value) || 0;
+      const fat = parseFloat(document.getElementById('meal-fat').value) || 0;
+      const fib = parseFloat(document.getElementById('meal-fib').value) || 0;
+
+      meals.push({ desc, cal, pro, carb, fat, fib });
       localStorage.setItem('liveMeals', JSON.stringify(meals));
-      renderUI();
-    }
+      document.getElementById('meal-form').reset();
+      renderDiet();
+    });
 
     function deleteMeal(idx) {
       meals.splice(idx, 1);
       localStorage.setItem('liveMeals', JSON.stringify(meals));
-      renderUI();
+      renderDiet();
     }
 
     function resetDay() {
-      if (confirm('לאפס את כל נתוני היום?')) {
+      if (confirm('לאפס את הארוחות והמאקרו להיום?')) {
         meals = [];
         localStorage.removeItem('liveMeals');
-        renderUI();
+        renderDiet();
       }
     }
 
+    /* --- כושר --- */
+    function saveFitness() {
+      const state = {
+        f1: document.getElementById('fit-1').checked,
+        f2: document.getElementById('fit-2').checked,
+        f3: document.getElementById('fit-3').checked
+      };
+      localStorage.setItem('fitnessState', JSON.stringify(state));
+    }
+
+    function loadFitness() {
+      const state = JSON.parse(localStorage.getItem('fitnessState')) || {};
+      if (state.f1) document.getElementById('fit-1').checked = true;
+      if (state.f2) document.getElementById('fit-2').checked = true;
+      if (state.f3) document.getElementById('fit-3').checked = true;
+    }
+
+    /* --- מוצ"ש --- */
+    function saveReview() {
+      const rev = {
+        keep: document.getElementById('rev-keep').value,
+        improve: document.getElementById('rev-improve').value,
+        contract: document.getElementById('rev-contract').value,
+        savedAt: new Date().toLocaleDateString('he-IL')
+      };
+      localStorage.setItem('weeklyReview', JSON.stringify(rev));
+      alert('בקרת מוצ״ש נשמרה בהצלחה!');
+    }
+
+    function loadReview() {
+      const rev = JSON.parse(localStorage.getItem('weeklyReview')) || {};
+      if (rev.keep) document.getElementById('rev-keep').value = rev.keep;
+      if (rev.improve) document.getElementById('rev-improve').value = rev.improve;
+      if (rev.contract) document.getElementById('rev-contract').value = rev.contract;
+    }
+
+    /* --- קליטה אוטומטית מ-URL (Apple Pay + סורק תזונה) --- */
     window.addEventListener('DOMContentLoaded', () => {
-      const p = new URLSearchParams(window.location.search);
-      if (p.has('desc') && p.has('cal')) {
-        addMealAuto(
-          p.get('desc'),
-          parseInt(p.get('cal')),
-          parseFloat(p.get('pro') || 0),
-          parseFloat(p.get('fat') || 0),
-          parseFloat(p.get('carb') || 0),
-          parseFloat(p.get('fib') || 0)
-        );
+      const params = new URLSearchParams(window.location.search);
+
+      // קליטת תשלום מ-Apple Pay
+      if (params.has('amt')) {
+        const amount = parseFloat(params.get('amt'));
+        const desc = params.get('desc') || 'הוצאה באפל פיי';
+        const cat = params.get('cat') || 'שונות ובלת״ם';
+        const date = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+
+        transactions.push({ desc, amount, cat, date });
+        localStorage.setItem('transactions', JSON.stringify(transactions));
         window.history.replaceState({}, document.title, window.location.pathname);
       }
-      renderUI();
+
+      // קליטת מנה מתזונה (לייב)
+      if (params.has('desc') && params.has('cal')) {
+        meals.push({
+          desc: params.get('desc'),
+          cal: parseInt(params.get('cal')),
+          pro: parseFloat(params.get('pro') || 0),
+          fat: parseFloat(params.get('fat') || 0),
+          carb: parseFloat(params.get('carb') || 0),
+          fib: parseFloat(params.get('fib') || 0)
+        });
+        localStorage.setItem('liveMeals', JSON.stringify(meals));
+        window.history.replaceState({}, document.title, window.location.pathname);
+        switchTab('diet');
+      }
+
+      renderBudget();
+      renderDiet();
+      loadFitness();
+      loadReview();
     });
   </script>
 </body>
